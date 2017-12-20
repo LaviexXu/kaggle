@@ -1,0 +1,8 @@
+{%extends 'tasks/base.html'%}
+{%block content%}
+    <p>Task:<br/>{{task.task_name}}</p>
+    <a href="{%url 'tasks:edit_task' task.id%}">edit this task</a>
+    <p>Display:{{task.display}}</p>
+    <p>用markdown解析器把overview,rules解析出来，放在这个页面预览</p>
+    <p>文件部分暂时都还没做</p>
+{%endblock content%}

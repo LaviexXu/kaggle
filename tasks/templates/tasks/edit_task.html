@@ -1,0 +1,9 @@
+{%extends 'tasks/base.html'%}
+{%block content%}
+    <p>Edit task:</p>
+    <form action="{%url 'tasks:edit_task' task.id%}" method="post">
+        {%csrf_token%}
+        {{form.as_p}}
+        <button name="submit">save change</button>
+    </form>
+{%endblock content%}
