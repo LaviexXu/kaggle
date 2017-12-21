@@ -33,3 +33,15 @@ def task_detail(request, task_id):
     task = Task.objects.get(id=task_id)
     context = {'task': task}
     return render(request, 'tasks/task_detail.html', context)
+
+
+def new_task(request):
+    if request.method != 'POST':
+        form = TaskForm()
+    else:
+        form = TaskForm(data=request.POST)
+        if form.is_valid():
+            form.save()
+            return HttpResponseRedirect(reverse('tasks: task_list'))
+    context = {'form': form}
+    return render(request, 'tasks/new_task.html', context)

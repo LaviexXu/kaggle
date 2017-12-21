@@ -8,4 +8,5 @@ urlpatterns = [
     url(r'^task_list/$', views.tasks, name='task_list'),
     url(r'^edit_task/(?P<task_id>\d+)/$', views.edit_task, name='edit_task'),
     url(r'^task_list/(?P<task_id>\d+)/$', views.task_detail, name='task_detail'),
+    url(r'^new_task/$', views.new_task, name='new_task'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
