@@ -11,7 +11,7 @@ Now you can browse the website at your browser by visiting [localhost:port],for 
 > localhost:8000
 
 Only following website are configured:
-admin
-task_list
-task_list/1
-edit_task/1
++ admin
++ task_list
++ task_list/1
++ edit_task/1
