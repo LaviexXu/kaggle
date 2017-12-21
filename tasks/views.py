@@ -21,7 +21,7 @@ def edit_task(request, task_id):
     if request.method != 'POST':
         form = TaskForm(instance=task)
     else:
-        form = TaskForm(instance=task, data=request.POST)
+        form = TaskForm(instance=task, data=request.POST, files=request.FILES)
         if form.is_valid():
             form.save()
             return HttpResponseRedirect(reverse('tasks:task_list'))
