@@ -16,6 +16,9 @@ Only the following websites are configured:
 + task_list
 + task_list/1
 + edit_task/1
++ task_list/1/description
++ task_list/1/data
++ task_list/1/leaderboard
 
 You can visit them by:
 > localhost:8000/admin/
