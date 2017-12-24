@@ -1,0 +1,36 @@
+{% load bootstrap3 %}
+    <head>
+        <!DOCTYPE html>
+        <html lang="en">
+            <head>
+                <meta charset="utf-8">
+                <meta http-equiv="X-UA-Compatible" content=""IE="edge">
+                <meta name="viewpor" content="width=device-width,initial-scale=1">
+
+                <title>kaggle</title>
+                {% bootstrap_css %}
+                {% bootstrap_javascript %}
+            </head>
+            <body>
+                <nav class="navbar navbar-toggleable-md navbar-light bg-faded">
+                    <div class="container">
+                        <div class="navbar-header">
+                    <span>
+                        {{task.task_name}}</span>
+                </div>
+                    <div id="navbar" class="navbar-collapse collapse">
+                    <ul class="nav navbar-nav">
+                        <li><a href="{% url 'tasks:task_description' task.id%}" >Description</a></li>
+                        <li><a href="{% url 'tasks:task_data' task.id%}" >Data</a></li>
+                        <li><a href="{% url 'tasks:task_leaderboard' task.id%}" >Leaderboard</a></li>
+                    </ul>
+                    </div>
+                    </div>
+                </nav>
+            <div class="container">
+                <div>
+                    {% block content %}{% endblock content %}
+                </div>
+            </div>
+    </body>
+    </html>

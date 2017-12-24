@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'bootstrap3',
     'tasks',
 ]
 
@@ -122,3 +123,6 @@ USE_TZ = True
 STATIC_URL = '/static/'
 MEDIA_URL = '/files/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'files')
+BOOTSTRAP3 = {
+    'include_jquery': True,
+}

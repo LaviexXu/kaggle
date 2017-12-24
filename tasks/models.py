@@ -9,8 +9,7 @@ def task_file_directory_path(instance, filename):
 # Create your models here.
 class Task(models.Model):
     task_name = models.CharField(max_length=200)
-    overview = models.FileField(upload_to=task_file_directory_path, null=True)
-    rules = models.FileField(upload_to=task_file_directory_path, null=True)
+    description = models.TextField(null=True)
     data_zip = models.FileField(upload_to=task_file_directory_path, null=True)
     date_added = models.DateTimeField(auto_now_add=True)
     display = models.BooleanField(default=True)

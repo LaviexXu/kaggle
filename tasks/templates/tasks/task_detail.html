@@ -2,8 +2,10 @@
 {%block content%}
     <p>Task:<br/>{{task.task_name}}</p>
     <a href="{%url 'tasks:edit_task' task.id%}">edit this task</a>
-    <p>Display:{{task.display}}</p>
-    <p>{{MEDIA_URL}}{{task.overview}}</p>
-    <p>用markdown解析器把overview,rules解析出来，放在这个页面预览</p>
-    <p>文件部分暂时都还没做</p>
+    <p>Display:{{task.display}}<br/>
+        这个页面是展示给教师看的，学生只能看到description，data，leaderboard三个板块的那个页面<br/>
+        这里只是方便调试,实际部署时是不显示这个属性的，这个属性是由老师来决定是否将该任务展示在task_list中的</p>
+    <h5>Description    (Overview&Rules)</h5>
+    <p>{{task.description}}</p>
+    <p>这列应该是数据下载,不过因为部署在服务器和本地调试时下载的方式不同,所以这个最后再做。</p>
 {%endblock content%}

@@ -1,7 +1,8 @@
 {%extends "tasks/base.html"%}
 {%block content%}
 <p>add a new task:</p>
-    <form action="{% url 'tasks:new_task' %}" method="post">
+    <form action="{% url 'tasks:new_task' %}" method="post"
+    enctype="multipart/form-data">
         {%csrf_token%}
         {{form.as_p}}
         <button name="submit">add task</button>

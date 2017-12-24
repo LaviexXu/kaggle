@@ -39,9 +39,32 @@ def new_task(request):
     if request.method != 'POST':
         form = TaskForm()
     else:
-        form = TaskForm(data=request.POST)
+        form = TaskForm(data=request.POST, files=request.FILES)
         if form.is_valid():
             form.save()
-            return HttpResponseRedirect(reverse('tasks: task_list'))
+            return HttpResponseRedirect(reverse('tasks:task_list'))
+        else:
+            context = {'form': form}
+            return render(request, 'tasks/error.html', context)
     context = {'form': form}
     return render(request, 'tasks/new_task.html', context)
+
+
+def task_description(request, task_id):
+    task = Task.objects.get(id=task_id)
+    context = {'task': task}
+    return render(request, 'tasks/overview.html', context)
+
+
+def task_data(request, task_id):
+    # download data zip
+    task = Task.objects.get(id=task_id)
+    context = {'task': task}
+    return render(request, 'tasks/data.html', context)
+
+
+def task_leaderboard(request, task_id):
+    # filter students' results by task_id
+    task = Task.objects.get(id=task_id)
+    context = {'task': task}
+    return render(request, 'tasks/leaderboard.html', context)
