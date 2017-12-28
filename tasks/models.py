@@ -19,3 +19,7 @@ class Task(models.Model):
 
     def _unicode_(self):
         return self.task_name
+
+
+class Result(models.Model):
+    task = models.ForeignKey(Task)

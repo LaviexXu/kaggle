@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'bootstrap3',
     'tasks',
+    'users'
 ]
 
 MIDDLEWARE = [
@@ -126,3 +127,4 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'files')
 BOOTSTRAP3 = {
     'include_jquery': True,
 }
+
