@@ -9,6 +9,8 @@ from .models import UserProfile
 
 # Create your views here.
 def register(request):
+    # if request.user.is_authenticated:
+    #     return HttpResponseRedirect(reverse('tasks:index'))
     if request.method != 'POST':
         form = UserForm()
     else:
@@ -19,10 +21,8 @@ def register(request):
             new_user.set_password(form.cleaned_data['password'])
             new_user.email = form.cleaned_data['email']
             new_user.save()
-            profile = UserProfile()
-            profile.user_id = new_user.id
-            profile.name = form.cleaned_data['name']
-            profile.save()
+            new_user.userprofile.name = form.cleaned_data['name']
+            new_user.userprofile.save()
             authenticated_user = authenticate(username=new_user.username,
                                               password=form.cleaned_data['password'])
             login(request, authenticated_user)
