@@ -12,17 +12,36 @@
                 {% bootstrap_javascript %}
             </head>
             <body>
+                <nav class="navbar navbar-default navbar-static-top">
+                    <div class="container">
+
+                    <div class="navbar-collapse collapse">
+
+                    <ul class="nav navbar-nav navbar-right">
+                        {% if user.is_authenticated %}
+                            <li><a>Hello,{{user.username}}</a></li>
+                            <li><a href="{% url 'users:logout' %}">log out</a> </li>
+                        {% else %}
+                            <li><a href="{% url 'users:register' %}">register</a> </li>
+                            <li><a href="{% url 'users:login' %}">log in</a> </li>
+a
+                        {% endif %}
+                    </ul>
+                </div>
+                </div>
+                 </nav>
+
                 <nav class="navbar navbar-toggleable-md navbar-light bg-faded">
                     <div class="container">
                         <div class="navbar-header">
-                    <span>
-                        {{task.task_name}}</span>
-                </div>
+                    <h3>{{task.task_name}}</h3>
+                </div><br/>
                     <div id="navbar" class="navbar-collapse collapse">
                     <ul class="nav navbar-nav">
                         <li><a href="{% url 'tasks:task_description' task.id%}" >Description</a></li>
                         <li><a href="{% url 'tasks:task_data' task.id%}" >Data</a></li>
                         <li><a href="{% url 'tasks:task_leaderboard' task.id%}" >Leaderboard</a></li>
+                        <li><a href="{% url 'tasks:submit_result' task.id%}" >Submit result</a></li>
                     </ul>
                     </div>
                     </div>

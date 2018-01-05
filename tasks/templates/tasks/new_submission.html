@@ -1,0 +1,10 @@
+{% extends 'tasks/nav_base.html' %}
+{% block content %}
+<h5>提交结果</h5>
+<form action="{% url 'tasks:submit_result' task.id%}" method="post"
+    enctype="multipart/form-data">
+        {%csrf_token%}
+        {{form.as_p}}
+        <button name="submit">submit result</button>
+    </form>
+{% endblock content %}

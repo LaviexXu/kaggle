@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from .forms import UserForm
 from django.contrib.auth.models import User
-from django.contrib.auth import login, authenticate
+from django.contrib.auth import login, authenticate,logout
 from django.http import HttpResponseRedirect
 from django.core.urlresolvers import reverse
 from .models import UserProfile
@@ -9,8 +9,8 @@ from .models import UserProfile
 
 # Create your views here.
 def register(request):
-    # if request.user.is_authenticated:
-    #     return HttpResponseRedirect(reverse('tasks:index'))
+    if request.user.is_authenticated:
+        return HttpResponseRedirect(reverse('tasks:index'))
     if request.method != 'POST':
         form = UserForm()
     else:
@@ -29,3 +29,8 @@ def register(request):
             return HttpResponseRedirect(reverse('tasks:index'))
     context = {'form': form}
     return render(request, 'users/register.html', context)
+
+
+def logout_view(request):
+    logout(request)
+    return HttpResponseRedirect(reverse('learning_logs:index'))

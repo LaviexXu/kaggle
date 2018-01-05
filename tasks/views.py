@@ -1,8 +1,9 @@
 from django.shortcuts import render
-from .models import Task
+from .models import Task,Result
 from django.http import HttpResponseRedirect, Http404
-from .forms import TaskForm
+from .forms import TaskForm,ResultForm
 from django.core.urlresolvers import reverse
+from django.contrib.auth.decorators import login_required
 
 
 # Create your views here.
@@ -68,3 +69,32 @@ def task_leaderboard(request, task_id):
     task = Task.objects.get(id=task_id)
     context = {'task': task}
     return render(request, 'tasks/leaderboard.html', context)
+
+
+def submit_result(request, task_id):
+    task = Task.objects.get(id=task_id)
+    user = request.user
+    submit_history = Result.objects.filter(task=task, user=user)
+    # 如果超过规定的可以提交的次数，则无法提交
+    if len(submit_history) > 9:
+        return render(request, 'tasks/submit_failed.html')
+    if request.method != 'POST':
+        result_form = ResultForm()
+        context = {'form': result_form, 'task': task}
+        return render(request, 'tasks/new_submission.html', context)
+    else:
+        result_form = ResultForm(data=request.POST, files=request.FILES)
+        if result_form.is_valid():
+            result = result_form.save(commit=False)
+            result.task = task
+            result.user = user
+            result.save()
+            return HttpResponseRedirect(reverse('tasks:view_submissions', args=[task_id]))
+
+
+def view_submissions(request, task_id):
+    task = Task.objects.get(id=task_id)
+    user = request.user
+    submit_history = Result.objects.filter(task=task, user=user)
+    context = {'submissions': submit_history, 'task': task}
+    return render(request, 'tasks/view_submissions.html', context)

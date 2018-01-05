@@ -1,0 +1,12 @@
+{% extends 'tasks/nav_base.html' %}
+{% block content %}
+<h5>提交记录</h5>
+<ul>
+        {%for submission in submisssions%}
+        <li>{{submission.description}}</li>
+        {%empty%}
+        <li>你还没有提交过结果</li>
+        {%endfor%}
+    </ul>
+<p><a href="{% url 'tasks:submit_result' task.id%}">点此提交新结果</a></p>
+{% endblock content %}
