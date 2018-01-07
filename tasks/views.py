@@ -5,6 +5,7 @@ from django.http import HttpResponseRedirect, Http404
 from .forms import TaskForm,ResultForm
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
+import csv
 
 
 # Create your views here.
@@ -35,7 +36,6 @@ def edit_task(request, task_id):
     return render(request, 'tasks/edit_task.html', context)
 
 
-@login_required
 def task_detail(request, task_id):
     # the page students and teachers can see are different
     if not request.user.is_staff:
@@ -107,6 +107,22 @@ def submit_result(request, task_id):
             result.task = task
             result.user = user
             result.save()
+            ref_result = []
+            user_result = []
+            with open(task.result_csv.path, newline='') as ref_csv:
+                ref_csv_reader = csv.reader(ref_csv, quoting=csv.QUOTE_NONNUMERIC)
+                for data in ref_csv_reader:
+                    ref_result.append(data[0])
+            with open(result.result_csv.path, newline='') as user_csv:
+                user_csv_reader = csv.reader(user_csv, quoting=csv.QUOTE_NONNUMERIC)
+                for data in user_csv_reader:
+                    user_result.append(data[0])
+            if len(user_result) == len(ref_result):
+                mean_square_error = 0
+                for i in range(len(ref_result)):
+                    mean_square_error += (user_result[i]-ref_result[i])**2
+                result.score = mean_square_error
+                result.save()
             return HttpResponseRedirect(reverse('tasks:view_submissions', args=[task_id]))
 
 
@@ -114,6 +130,6 @@ def submit_result(request, task_id):
 def view_submissions(request, task_id):
     task = Task.objects.get(id=task_id)
     user = request.user
-    submit_history = Result.objects.filter(task=task, user=user)
+    submit_history = Result.objects.filter(task=task, user=user).order_by('date_added')
     context = {'submissions': submit_history, 'task': task}
     return render(request, 'tasks/view_submissions.html', context)

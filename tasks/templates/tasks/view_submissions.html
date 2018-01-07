@@ -3,7 +3,11 @@
 <h5>提交记录</h5>
 <ul>
         {%for submission in submissions%}
-        <li>{{submission.description}}</li>
+        <li>
+                <p>提交时间：{{submission.date_added}}</p>
+                <p>本次得分：{{submission.score}}</p>
+                <p>描述：{{submission.description}}</p>
+        </li>
         {%empty%}
         <p>你还没有提交过结果</p>
         {%endfor%}
