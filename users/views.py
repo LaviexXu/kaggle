@@ -33,4 +33,4 @@ def register(request):
 
 def logout_view(request):
     logout(request)
-    return HttpResponseRedirect(reverse('learning_logs:index'))
+    return HttpResponseRedirect(reverse('tasks:index'))

@@ -7,6 +7,7 @@ class Task(models.Model):
     task_name = models.CharField(max_length=200)
     description = models.TextField(null=True)
     data_zip = models.FileField(upload_to='task_data', null=True)
+    result_excel = models.FileField(upload_to='task_data', null=True)
     date_added = models.DateTimeField(auto_now_add=True)
     display = models.BooleanField(default=True)
 
@@ -26,6 +27,7 @@ class Result(models.Model):
     user = models.ForeignKey(User)
     result_excel = models.FileField(upload_to=_upload_path)
     description = models.TextField(null=True)
+    score = models.DecimalField(max_digits=7, decimal_places=5, default=10)
 
     def get_upload_path(self, filename):
-        return str(self.user.id) + "/" + 'task_' + str(self.task.id) + "/" + filename
+        return str(self.user.username) + "/" + 'task_' + str(self.task.id) + "/" + filename

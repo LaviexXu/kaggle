@@ -2,10 +2,10 @@
 {% block content %}
 <h5>提交记录</h5>
 <ul>
-        {%for submission in submisssions%}
+        {%for submission in submissions%}
         <li>{{submission.description}}</li>
         {%empty%}
-        <li>你还没有提交过结果</li>
+        <p>你还没有提交过结果</p>
         {%endfor%}
     </ul>
 <p><a href="{% url 'tasks:submit_result' task.id%}">点此提交新结果</a></p>

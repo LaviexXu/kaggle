@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from .models import Task,Result
+from django.contrib.auth.models import User
 from django.http import HttpResponseRedirect, Http404
 from .forms import TaskForm,ResultForm
 from django.core.urlresolvers import reverse
@@ -17,7 +18,11 @@ def tasks(request):
     return render(request, 'tasks/task_list.html', context)
 
 
+@login_required
 def edit_task(request, task_id):
+    # students can not edit any task
+    if not request.user.is_staff:
+        return HttpResponseRedirect(reverse('tasks:task_description', args=[task_id]))
     task = Task.objects.get(id=task_id)
     if request.method != 'POST':
         form = TaskForm(instance=task)
@@ -30,13 +35,20 @@ def edit_task(request, task_id):
     return render(request, 'tasks/edit_task.html', context)
 
 
+@login_required
 def task_detail(request, task_id):
+    # the page students and teachers can see are different
+    if not request.user.is_staff:
+        return HttpResponseRedirect(reverse('tasks:task_description', args=[task_id]))
     task = Task.objects.get(id=task_id)
     context = {'task': task}
     return render(request, 'tasks/task_detail.html', context)
 
 
+@login_required
 def new_task(request):
+    if not request.user.is_staff:
+        return HttpResponseRedirect(reverse('tasks:task_list'))
     if request.method != 'POST':
         form = TaskForm()
     else:
@@ -67,16 +79,22 @@ def task_data(request, task_id):
 def task_leaderboard(request, task_id):
     # filter students' results by task_id
     task = Task.objects.get(id=task_id)
-    context = {'task': task}
+    users = User.objects.all()
+    results = []*len(users)
+    for user in users:
+        if Result.objects.filter(task=task, user=user).count() > 0:
+            user_results = Result.objects.filter(task=task, user=user).order_by('score')
+            results.append(user_results[0])
+    context = {'task': task, 'results': results}
     return render(request, 'tasks/leaderboard.html', context)
 
 
+@login_required
 def submit_result(request, task_id):
     task = Task.objects.get(id=task_id)
     user = request.user
-    submit_history = Result.objects.filter(task=task, user=user)
     # 如果超过规定的可以提交的次数，则无法提交
-    if len(submit_history) > 9:
+    if Result.objects.count() > 9:
         return render(request, 'tasks/submit_failed.html')
     if request.method != 'POST':
         result_form = ResultForm()
@@ -92,6 +110,7 @@ def submit_result(request, task_id):
             return HttpResponseRedirect(reverse('tasks:view_submissions', args=[task_id]))
 
 
+@login_required
 def view_submissions(request, task_id):
     task = Task.objects.get(id=task_id)
     user = request.user

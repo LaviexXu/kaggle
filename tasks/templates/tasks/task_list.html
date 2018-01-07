@@ -1,4 +1,4 @@
-{%extends "tasks/base.html"%}
+{%extends "users/stuinfo.html"%}
 {%block content%}
     <p>Tasks</p>
     <ul>
@@ -8,5 +8,7 @@
         <li>No tasks have been added</li>
         {%endfor%}
     </ul>
-    <a href="{% url 'tasks:new_task' %}">add a new task</a>
+    {% if user.is_stuff %}
+        <a href="{% url 'tasks:new_task' %}">add a new task</a>
+    {% endif %}
 {%endblock content%}

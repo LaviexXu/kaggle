@@ -1,12 +1,6 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>首页</title>
-</head>
-<body>
+{% extends 'users/stuinfo.html' %}
+{% block content %}
     <p>这是一个没做好的主页</p>
     <a href="{% url 'tasks:task_list' %}">任务列表</a>
     <p>以后可以把任务列表作为主页，或者是选择某个任务展示在主页</p>
-</body>
-</html>
+{% endblock content %}

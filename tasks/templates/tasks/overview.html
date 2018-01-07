@@ -1,5 +1,4 @@
 {% extends 'tasks/nav_base.html' %}
 {%block content%}
-<p>{{task.description}}</p>
-<p>(需要的话以后再美化界面)</p>
+<p>{{task.description|linebreaks}}</p>
 {%endblock content%}
