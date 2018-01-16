@@ -1,8 +1,0 @@
-{%extends 'tasks/base.html'%}
-{%block content%}
-    {% for field in form %}
-        <p>new field</p>
-        {{ field.errors }}
-        {{ field.label_tag }}: {{ field }}
-    {% endfor %}
-{%endblock content%}

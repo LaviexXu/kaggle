@@ -1,11 +1,12 @@
 from django.shortcuts import render
-from .models import Task,Result
+from .models import Task, Result, Report
 from django.contrib.auth.models import User
 from django.http import HttpResponseRedirect, Http404
-from .forms import TaskForm,ResultForm
+from .forms import TaskForm, ResultForm, ReportForm
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
 import csv
+from .pdfdiff import read_pdf, get_similarity
 
 
 # Create your views here.
@@ -33,7 +34,7 @@ def edit_task(request, task_id):
             form.save()
             return HttpResponseRedirect(reverse('tasks:task_list'))
     context = {'task': task,  'form': form}
-    return render(request, 'tasks/edit_task.html', context)
+    return render(request, 'tasks/teacher_only/edit_task.html', context)
 
 
 def task_detail(request, task_id):
@@ -42,7 +43,7 @@ def task_detail(request, task_id):
         return HttpResponseRedirect(reverse('tasks:task_description', args=[task_id]))
     task = Task.objects.get(id=task_id)
     context = {'task': task}
-    return render(request, 'tasks/task_detail.html', context)
+    return render(request, 'tasks/teacher_only/task_detail.html', context)
 
 
 @login_required
@@ -56,11 +57,8 @@ def new_task(request):
         if form.is_valid():
             form.save()
             return HttpResponseRedirect(reverse('tasks:task_list'))
-        else:
-            context = {'form': form}
-            return render(request, 'tasks/error.html', context)
     context = {'form': form}
-    return render(request, 'tasks/new_task.html', context)
+    return render(request, 'tasks/teacher_only/new_task.html', context)
 
 
 def task_description(request, task_id):
@@ -123,6 +121,7 @@ def submit_result(request, task_id):
                     mean_square_error += (user_result[i]-ref_result[i])**2
                 result.score = mean_square_error
                 result.save()
+            # else: 上传失败页面
             return HttpResponseRedirect(reverse('tasks:view_submissions', args=[task_id]))
 
 
@@ -133,3 +132,42 @@ def view_submissions(request, task_id):
     submit_history = Result.objects.filter(task=task, user=user).order_by('date_added')
     context = {'submissions': submit_history, 'task': task}
     return render(request, 'tasks/view_submissions.html', context)
+
+
+@login_required
+def submit_report(request, task_id):
+    task = Task.objects.get(id=task_id)
+    user = request.user
+    if Report.objects.filter(task=task, user=user).count() > 0:
+        context = {'task': task}
+        return render(request, 'tasks/submit_successful.html', context)
+
+    if request.method != 'POST':
+        report_form = ReportForm()
+        context = {'form': report_form, 'task': task}
+        return render(request, 'tasks/submit_report.html', context)
+    else:
+        report_form = ReportForm(data=request.POST, files=request.FILES)
+        report = report_form.save(commit=False)
+        report.task = task
+        report.user = user
+        report.save()
+        context = {'task': task}
+        return render(request, 'tasks/submit_successful.html', context)
+
+
+@login_required
+# 此页面仅教师可见
+def view_reports(request, task_id):
+    task = Task.objects.get(id=task_id)
+    reports = Report.objects.filter(task=task)
+    context = {'reports': reports}
+    return render(request, 'tasks/teacher_only/view_reports.html', context)
+
+
+# @login_required 此页面仅教师可见
+def report_detail(request, task_id, student_id):
+    task = Task.objects.get(id=task_id)
+    student = User.objects.get(id=student_id)
+    report = Report.objects.get(task=task, user=student)
+    sentences = read_pdf(report.report.path)

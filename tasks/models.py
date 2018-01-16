@@ -32,3 +32,12 @@ class Result(models.Model):
 
     def get_upload_path(self, filename):
         return str(self.user.username) + "/" + 'task_' + str(self.task.id) + "/" + filename
+
+
+class Report(models.Model):
+    task = models.ForeignKey(Task)
+    user = models.ForeignKey(User)
+    report = models.FileField(upload_to=_upload_path)
+
+    def get_upload_path(self, filename):
+        return str(self.user.username) + "/" + 'task_' + str(self.task.id) + "/" + filename

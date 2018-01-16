@@ -2,16 +2,22 @@
 {% block navigation %}
 <div id="navbar" class="navbar-collapse collapse" style="border-bottom:1px solid gray;">
     <ul class="nav navbar-nav">
-        <li><a href="{% url 'tasks:task_description' task.id%}"
-               style="color:#66b3ff;border-bottom:3px solid #66b3ff">Description</a></li>
+        <li><a href="{% url 'tasks:task_description' task.id%}" style="color:black">Description</a></li>
         <li><a href="{% url 'tasks:task_data' task.id%}" style="color:black">Data</a></li>
         <li><a href="{% url 'tasks:task_leaderboard' task.id%}" style="color:black">Leaderboard</a></li>
         <li><a href="{% url 'tasks:submit_result' task.id%}" style="color:black">Submit result</a></li>
         <li><a href="{% url 'tasks:view_submissions' task.id%}" style="color:black">My submissions</a></li>
-        <li><a href="{% url 'tasks:submit_report' task.id%}" style="color:black">Report</a></li>
+        <li><a href="{% url 'tasks:submit_report' task.id%}"
+                                   style="color:#66b3ff;border-bottom:3px solid #66b3ff">Report</a></li>
     </ul>
 </div>
 {% endblock navigation %}
-{%block content%}
-<p>{{task.description|linebreaks}}</p>
-{%endblock content%}
+{% block content %}
+<h5>提交论文</h5>
+<form action="{% url 'tasks:submit_paper' task.id%}" method="post"
+    enctype="multipart/form-data">
+        {%csrf_token%}
+        {{form.as_p}}
+        <button name="submit">submit paper</button>
+    </form>
+{% endblock content %}

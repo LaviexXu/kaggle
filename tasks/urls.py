@@ -12,5 +12,9 @@ urlpatterns = [
     url(r'^task_list/(?P<task_id>\d+)/data/$', views.task_data, name='task_data'),
     url(r'^task_list/(?P<task_id>\d+)/leaderboard/$', views.task_leaderboard, name='task_leaderboard'),
     url(r'^task_list/(?P<task_id>\d+)/submit_result/$', views.submit_result, name='submit_result'),
-    url(r'^task_list/(?P<task_id>\d+)/my_submissions/$', views.view_submissions, name='view_submissions')
+    url(r'^task_list/(?P<task_id>\d+)/my_submissions/$', views.view_submissions, name='view_submissions'),
+    url(r'^task_list/(?P<task_id>\d+)/submit_report/$', views.submit_report, name='submit_report'),
+    url(r'^task_list/(?P<task_id>\d+)/view_reports/$', views.view_reports, name='view_reports'),
+    url(r'^task_list/(?P<task_id>\d+)/report_detail/(?P<student_id>\d+)/$',
+        views.report_detail, name='report_detail'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

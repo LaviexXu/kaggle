@@ -1,4 +1,17 @@
 {% extends 'tasks/nav_base.html' %}
+{% block navigation %}
+<div id="navbar" class="navbar-collapse collapse" style="border-bottom:1px solid gray;">
+    <ul class="nav navbar-nav">
+        <li><a href="{% url 'tasks:task_description' task.id%}" style="color:black">Description</a></li>
+        <li><a href="{% url 'tasks:task_data' task.id%}"
+               style="color:#66b3ff;border-bottom:3px solid #66b3ff">Data</a></li>
+        <li><a href="{% url 'tasks:task_leaderboard' task.id%}" style="color:black">Leaderboard</a></li>
+        <li><a href="{% url 'tasks:submit_result' task.id%}" style="color:black">Submit result</a></li>
+        <li><a href="{% url 'tasks:view_submissions' task.id%}" style="color:black">My submissions</a></li>
+        <li><a href="{% url 'tasks:submit_report' task.id%}" style="color:black">Report</a></li>
+    </ul>
+</div>
+{% endblock navigation %}
 {%block content%}
 <p>此处应该是数据下载，稍后完善</p>
 {%endblock content%}
