@@ -3,7 +3,7 @@
     <p>Tasks</p>
     <ul>
         {%for task in tasks%}
-        <li><a href="{%url 'tasks:task_detail' task.id%}">{{task.task_name}}</a></li>
+        <li><a href="{%url 'tasks:task_detail' task.id%}" target="_blank">{{task.task_name}}</a></li>
         {%empty%}
         <li>No tasks have been added</li>
         {%endfor%}

@@ -7,6 +7,14 @@ from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
 import csv
 from .pdfdiff import read_pdf, get_similarity
+from kaggle.settings import STATIC_ROOT
+import os
+
+
+class SimilarPair():
+    def __init__(self, origin_sentence, similar_sentence):
+        self.origin_sentence = origin_sentence
+        self.similar_sentence = similar_sentence
 
 
 # Create your views here.
@@ -83,6 +91,8 @@ def task_leaderboard(request, task_id):
         if Result.objects.filter(task=task, user=user).count() > 0:
             user_results = Result.objects.filter(task=task, user=user).order_by('score')
             results.append(user_results[0])
+
+    results.sort(key=lambda result: result.score)
     context = {'task': task, 'results': results}
     return render(request, 'tasks/leaderboard.html', context)
 
@@ -161,7 +171,7 @@ def submit_report(request, task_id):
 def view_reports(request, task_id):
     task = Task.objects.get(id=task_id)
     reports = Report.objects.filter(task=task)
-    context = {'reports': reports}
+    context = {'reports': reports,'task': task}
     return render(request, 'tasks/teacher_only/view_reports.html', context)
 
 
@@ -171,3 +181,25 @@ def report_detail(request, task_id, student_id):
     student = User.objects.get(id=student_id)
     report = Report.objects.get(task=task, user=student)
     sentences = read_pdf(report.report.path)
+    context = {'sentences': sentences}
+    other_reports = Report.objects.filter(task=task).exclude(user=student)
+    similar_pairs = []
+    if len(other_reports) > 0:
+        stopwords_file_path = os.path.join(STATIC_ROOT, 'stopwords.txt')
+        stopwords_file = open(stopwords_file_path, encoding='utf-8')
+        stopwords = {}.fromkeys([line.rstrip() for line in stopwords_file])
+        stopwords_file.close()
+        for other_report in other_reports:
+            compare_sentences = read_pdf(other_report.report.path)
+            for sentence in sentences:
+                max_similarity = 0
+                similar_sentence = ''
+                for compare_sentence in compare_sentences:
+                    cur_sim = get_similarity(sentence, compare_sentence, stopwords)
+                    if cur_sim > 0.5 and cur_sim > max_similarity:
+                        max_similarity = cur_sim
+                        similar_sentence = compare_sentence
+                if max_similarity > 0.5:
+                    similar_pairs.append(SimilarPair(sentence, similar_sentence))
+        context = {'similar_pairs': similar_pairs}
+    return render(request, 'tasks/teacher_only/report_detail.html', context)

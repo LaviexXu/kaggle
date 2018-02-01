@@ -1,4 +1,4 @@
-{%extends 'tasks/base.html'%}
+{%extends 'users/stuinfo.html'%}
 {%block content%}
     <p>Task:<br/>{{task.task_name}}</p>
     <a href="{%url 'tasks:edit_task' task.id%}">edit this task</a>

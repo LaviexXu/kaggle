@@ -7,7 +7,7 @@
                 <meta http-equiv="X-UA-Compatible" content=""IE="edge">
                 <meta name="viewpor" content="width=device-width,initial-scale=1">
 
-                <title>kaggle</title>
+                <title>{{task.task_name}}</title>
                 {% bootstrap_css %}
                 {% bootstrap_javascript %}
             </head>
@@ -16,7 +16,9 @@
                     <div class="container">
 
                     <div class="navbar-collapse collapse">
-                        <h4><a href="{% url 'tasks:index' %}">Home Page</a></h4>
+                        <div class="navbar_header">
+                            <a href="{% url 'tasks:index' %}" class="navbar-brand">Home Page</a>
+                        </div>
                     <ul class="nav navbar-nav navbar-right">
                         {% if user.is_authenticated %}
                             <li><a>Hello,{{user.userprofile.name}}</a></li>
@@ -24,7 +26,6 @@
                         {% else %}
                             <li><a href="{% url 'users:register' %}">register</a> </li>
                             <li><a href="{% url 'users:login' %}">log in</a> </li>
-a
                         {% endif %}
                     </ul>
                 </div>

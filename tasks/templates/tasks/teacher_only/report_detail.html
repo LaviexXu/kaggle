@@ -1,10 +1,13 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
-
-</body>
-</html>
+{% extends 'users/stuinfo.html' %}
+{% block content %}
+    <div class="container" style="display:inline-block;">
+            <ul>
+            {% for pair in similar_pairs %}
+                <li><p>原文语句：{{pair.origin_sentence}}</p>
+                <p>相似语句：{{pair.similar_sentence}}</p></li>
+                {% empty %}
+                <p>未发现相似语句</p>
+            {% endfor %}
+            </ul>
+    </div>
+{% endblock content %}

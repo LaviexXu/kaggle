@@ -23,7 +23,6 @@ def read_pdf(filename):
     not_title = re.compile(r'^.*。$')
     article = ''
     ref_paper = re.compile(r'^\[\d+\].+')
-    not_chinese = re.compile(r'\w+')
     for page in PDFPage.create_pages(document):
         interpreter.process_page(page)
         # 接受该页面的LTPage对象
@@ -40,15 +39,15 @@ def read_pdf(filename):
                 if reference is not None:
                     break
                 if len(text) > 25:
-                    article += re.sub(not_chinese, '', text)
+                    article += re.sub(r' +', '', text)
                 elif para_end is not None:
-                    article += re.sub(not_chinese, '', para_end.group(0))
+                    article += re.sub(r' +', '', para_end.group(0))
     sentences = article.split('。')
+    fp.close()
     return sentences
 
 
-def get_similarity(origin_string, compare_string):
-    stopwords = {}.fromkeys([line.rstrip() for line in open('ts/stopwords.txt', encoding='utf-8')])
+def get_similarity(origin_string, compare_string, stopwords):
     origin_string_keywords = []
     for word in jieba.cut(origin_string):
         if word not in stopwords:
@@ -58,6 +57,8 @@ def get_similarity(origin_string, compare_string):
         if word not in stopwords:
             compare_string_keywords.append(word)
     intersection = 0
+    if len(origin_string_keywords) < 5 or len(compare_string_keywords) < 5:
+        return 0
     for word in compare_string_keywords:
         if word in origin_string_keywords:
             intersection += 1

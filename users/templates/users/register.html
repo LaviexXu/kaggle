@@ -5,8 +5,10 @@
     {% endif %}
     <form action="{%url 'users:register'%}" method="post">
         {% csrf_token %}
-        {{form.as_p}}
-        <button name="submit">sign up</button>
+        {% bootstrap_form form %}
+        {% buttons %}
+        <button name="submit" class="btn btn-primary">sign up</button>
+        {% endbuttons %}
         <input type="hidden" name="next" value="{%url 'tasks:index'%}"/>
     </form>
 {%endblock content%}
