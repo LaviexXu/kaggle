@@ -27,7 +27,7 @@ class Result(models.Model):
     user = models.ForeignKey(User)
     result_csv = models.FileField(upload_to=_upload_path)
     description = models.TextField(null=True)
-    date_added = models.DateTimeField(auto_now_add=True,null=True)
+    date_added = models.DateTimeField(auto_now_add=True, null=True)
     score = models.DecimalField(max_digits=7, decimal_places=5, default=10)
 
     def get_upload_path(self, filename):

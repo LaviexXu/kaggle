@@ -1,0 +1,12 @@
+{%extends 'users/stuinfo.html'%}
+{% load bootstrap3 %}
+{%block content%}
+    <p>New email</p>
+    <form action="{%url 'tasks:new_email'%}" method="post">
+        {%csrf_token%}
+        {%bootstrap_form form%}
+        {% buttons %}
+        <button name="submit" class="btn btn-primary">send</button>
+        {% endbuttons %}
+    </form>
+{%endblock content%}

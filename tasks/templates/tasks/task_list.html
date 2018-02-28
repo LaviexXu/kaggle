@@ -11,4 +11,6 @@
     {% if user.is_stuff %}
         <a href="{% url 'tasks:new_task' %}">add a new task</a>
     {% endif %}
+    <p>Email</p>
+    <a href="{% url 'tasks:new_email' %}" target="_blank">write a new email</a>
 {%endblock content%}

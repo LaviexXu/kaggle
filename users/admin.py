@@ -5,14 +5,14 @@ from .models import UserProfile
 # Register your models here.
 
 
-class EmployeeInline(admin.StackedInline):
+class UserInline(admin.StackedInline):
     model = UserProfile
     can_delete = False
 
 
 # Define a new User admin
 class UserAdmin(BaseUserAdmin):
-    inlines = (EmployeeInline, )
+    inlines = (UserInline, )
 
 
 # Re-register UserAdmin

@@ -20,6 +20,7 @@ def register(request):
             new_user.username = form.cleaned_data['username']
             new_user.set_password(form.cleaned_data['password'])
             new_user.email = form.cleaned_data['email']
+            new_user.is_staff = False
             new_user.save()
             new_user.userprofile.name = form.cleaned_data['name']
             new_user.userprofile.save()

@@ -1,14 +1,16 @@
 from django.shortcuts import render
 from .models import Task, Result, Report
 from django.contrib.auth.models import User
-from django.http import HttpResponseRedirect, Http404
-from .forms import TaskForm, ResultForm, ReportForm
+from django.http import HttpResponseRedirect, HttpResponse
+from .forms import TaskForm, ResultForm, ReportForm, EmailForm
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
 import csv
 from .pdfdiff import read_pdf, get_similarity
-from kaggle.settings import STATIC_ROOT
-import os
+from kaggle.settings import STATIC_ROOT, DEFAULT_FROM_EMAIL
+from django.core.mail import send_mail
+from smtplib import SMTPException
+import os,sys
 
 
 class SimilarPair():
@@ -52,6 +54,31 @@ def task_detail(request, task_id):
     task = Task.objects.get(id=task_id)
     context = {'task': task}
     return render(request, 'tasks/teacher_only/task_detail.html', context)
+
+
+@login_required
+def new_email(request):
+    if not request.user.is_staff:
+        return HttpResponseRedirect(reverse('tasks:task_list'))
+    if request.method != 'POST':
+        form = EmailForm()
+        context = {'form': form}
+        return render(request, 'tasks/teacher_only/new_email.html', context)
+    else:
+        form = EmailForm(data=request.POST)
+        if form.is_valid():
+            subject = form.cleaned_data['subject']
+            content = form.cleaned_data['content']
+            recipient_user_list = User.objects.filter(is_staff=False)
+            recipient = []*len(recipient_user_list)
+            for user in recipient_user_list:
+                recipient.append(user.email)
+            try:
+                send_mail(subject, content, from_email=DEFAULT_FROM_EMAIL, recipient_list=recipient, fail_silently=False)
+            except SMTPException:
+                print("Unexpected error:", sys.exc_info()[0])
+                return HttpResponse('email sending failed')
+            return HttpResponse('email has been sent to all student.You can check it in your mail-box')
 
 
 @login_required

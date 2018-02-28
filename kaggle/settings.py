@@ -130,3 +130,10 @@ BOOTSTRAP3 = {
 }
 
 LOGIN_URL = '/users/login/'
+
+EMAIL_USE_SSL = True
+EMAIL_HOST = 'smtp.qq.com'
+EMAIL_PORT = 465
+EMAIL_HOST_USER = '854238101@qq.com'
+EMAIL_HOST_PASSWORD = 'dzyucdsgoughbcbg'
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER

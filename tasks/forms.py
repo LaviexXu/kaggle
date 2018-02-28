@@ -20,3 +20,9 @@ class ReportForm(forms.ModelForm):
     class Meta:
         model = Report
         fields = ['report']
+
+
+class EmailForm(forms.Form):
+    subject = forms.Field(label='标题')
+    content = forms.CharField(label='正文', widget=forms.Textarea)
+
