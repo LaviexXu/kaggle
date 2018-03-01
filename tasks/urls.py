@@ -11,6 +11,7 @@ urlpatterns = [
     url(r'^new_task/$', views.new_task, name='new_task'),
     url(r'^task_list/(?P<task_id>\d+)/description/$', views.task_description, name='task_description'),
     url(r'^task_list/(?P<task_id>\d+)/data/$', views.task_data, name='task_data'),
+    url(r'^task_list/(?P<task_id>\d+)/data_download/$', views.data_download, name='data_download'),
     url(r'^task_list/(?P<task_id>\d+)/leaderboard/$', views.task_leaderboard, name='task_leaderboard'),
     url(r'^task_list/(?P<task_id>\d+)/submit_result/$', views.submit_result, name='submit_result'),
     url(r'^task_list/(?P<task_id>\d+)/my_submissions/$', views.view_submissions, name='view_submissions'),

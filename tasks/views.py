@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from .models import Task, Result, Report
 from django.contrib.auth.models import User
-from django.http import HttpResponseRedirect, HttpResponse
+from django.http import HttpResponseRedirect, HttpResponse,FileResponse
 from .forms import TaskForm, ResultForm, ReportForm, EmailForm
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
@@ -103,10 +103,19 @@ def task_description(request, task_id):
 
 
 def task_data(request, task_id):
-    # download data zip
+    # download data zip page
     task = Task.objects.get(id=task_id)
     context = {'task': task}
     return render(request, 'tasks/data.html', context)
+
+
+def data_download(request, task_id):
+    task = Task.objects.get(id=task_id)
+    data_file = open(task.data_zip.path, 'rb')
+    response = FileResponse(data_file)
+    response['Content-Type'] = 'application/octet-stream'
+    response['Content-Disposition'] = 'attachment;filename="{0}"'.format(task.data_zip.name)
+    return response
 
 
 def task_leaderboard(request, task_id):
