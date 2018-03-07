@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from .models import Task, Result, Report
 from django.contrib.auth.models import User
-from django.http import HttpResponseRedirect, HttpResponse,FileResponse
+from django.http import HttpResponseRedirect, HttpResponse, FileResponse
 from .forms import TaskForm, ResultForm, ReportForm, EmailForm
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
@@ -10,10 +10,11 @@ from .pdfdiff import read_pdf, get_similarity
 from kaggle.settings import STATIC_ROOT, DEFAULT_FROM_EMAIL
 from django.core.mail import send_mail
 from smtplib import SMTPException
-import os,sys
+import os
+import sys
 
 
-class SimilarPair():
+class SimilarPair:
     def __init__(self, origin_sentence, similar_sentence):
         self.origin_sentence = origin_sentence
         self.similar_sentence = similar_sentence
@@ -21,10 +22,17 @@ class SimilarPair():
 
 # Create your views here.
 def index(request):
-    return render(request, 'tasks/index.html')
+    if Task.objects.count() > 0:
+        task = Task.objects.filter(display=True)[0]
+        context = {'task': task}
+        return render(request, 'tasks/description.html', context)
+    else:
+        return HttpResponse("There is no task for now.")
 
 
 def tasks(request):
+    if not request.user.is_staff:
+        return HttpResponseRedirect(reverse('tasks:index'))
     task_list = Task.objects.order_by('date_added')
     context = {'tasks': task_list}
     return render(request, 'tasks/task_list.html', context)
@@ -34,7 +42,7 @@ def tasks(request):
 def edit_task(request, task_id):
     # students can not edit any task
     if not request.user.is_staff:
-        return HttpResponseRedirect(reverse('tasks:task_description', args=[task_id]))
+        return HttpResponseRedirect(reverse('tasks:index'))
     task = Task.objects.get(id=task_id)
     if request.method != 'POST':
         form = TaskForm(instance=task)
@@ -50,7 +58,7 @@ def edit_task(request, task_id):
 def task_detail(request, task_id):
     # the page students and teachers can see are different
     if not request.user.is_staff:
-        return HttpResponseRedirect(reverse('tasks:task_description', args=[task_id]))
+            return HttpResponseRedirect(reverse('index'))
     task = Task.objects.get(id=task_id)
     context = {'task': task}
     return render(request, 'tasks/teacher_only/task_detail.html', context)
@@ -59,7 +67,7 @@ def task_detail(request, task_id):
 @login_required
 def new_email(request):
     if not request.user.is_staff:
-        return HttpResponseRedirect(reverse('tasks:task_list'))
+        return HttpResponseRedirect(reverse('tasks:index'))
     if request.method != 'POST':
         form = EmailForm()
         context = {'form': form}
@@ -76,7 +84,6 @@ def new_email(request):
             try:
                 send_mail(subject, content, from_email=DEFAULT_FROM_EMAIL, recipient_list=recipient, fail_silently=False)
             except SMTPException:
-                print("Unexpected error:", sys.exc_info()[0])
                 return HttpResponse('email sending failed')
             return HttpResponse('email has been sent to all student.You can check it in your mail-box')
 
@@ -84,7 +91,7 @@ def new_email(request):
 @login_required
 def new_task(request):
     if not request.user.is_staff:
-        return HttpResponseRedirect(reverse('tasks:task_list'))
+        return HttpResponseRedirect(reverse('tasks:index'))
     if request.method != 'POST':
         form = TaskForm()
     else:
@@ -99,7 +106,7 @@ def new_task(request):
 def task_description(request, task_id):
     task = Task.objects.get(id=task_id)
     context = {'task': task}
-    return render(request, 'tasks/overview.html', context)
+    return render(request, 'tasks/description.html', context)
 
 
 def task_data(request, task_id):
@@ -167,7 +174,9 @@ def submit_result(request, task_id):
                     mean_square_error += (user_result[i]-ref_result[i])**2
                 result.score = mean_square_error
                 result.save()
-            # else: 上传失败页面
+            else:
+                result.delete()
+                return HttpResponse("上传失败，请检查文件格式是否正确")
             return HttpResponseRedirect(reverse('tasks:view_submissions', args=[task_id]))
 
 
@@ -194,12 +203,16 @@ def submit_report(request, task_id):
         return render(request, 'tasks/submit_report.html', context)
     else:
         report_form = ReportForm(data=request.POST, files=request.FILES)
-        report = report_form.save(commit=False)
-        report.task = task
-        report.user = user
-        report.save()
-        context = {'task': task}
-        return render(request, 'tasks/submit_successful.html', context)
+        if report_form.is_valid():
+            report = report_form.save(commit=False)
+            if report.report.name.endswith("pdf"):
+                report.task = task
+                report.user = user
+                report.save()
+                context = {'task': task}
+                return render(request, 'tasks/submit_successful.html', context)
+            else:
+                return HttpResponse("提交失败，请检查文件格式，仅限上传pdf。")
 
 
 @login_required
@@ -207,11 +220,11 @@ def submit_report(request, task_id):
 def view_reports(request, task_id):
     task = Task.objects.get(id=task_id)
     reports = Report.objects.filter(task=task)
-    context = {'reports': reports,'task': task}
+    context = {'reports': reports, 'task': task}
     return render(request, 'tasks/teacher_only/view_reports.html', context)
 
 
-# @login_required 此页面仅教师可见
+@login_required
 def report_detail(request, task_id, student_id):
     task = Task.objects.get(id=task_id)
     student = User.objects.get(id=student_id)
