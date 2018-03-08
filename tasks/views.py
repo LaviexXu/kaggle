@@ -58,7 +58,7 @@ def edit_task(request, task_id):
 def task_detail(request, task_id):
     # the page students and teachers can see are different
     if not request.user.is_staff:
-            return HttpResponseRedirect(reverse('index'))
+            return HttpResponseRedirect(reverse('tasks:index'))
     task = Task.objects.get(id=task_id)
     context = {'task': task}
     return render(request, 'tasks/teacher_only/task_detail.html', context)
@@ -104,16 +104,22 @@ def new_task(request):
 
 
 def task_description(request, task_id):
-    task = Task.objects.get(id=task_id)
-    context = {'task': task}
-    return render(request, 'tasks/description.html', context)
+    if task_id == Task.objects.filter(display=True)[0].id:
+        task = Task.objects.get(id=task_id)
+        context = {'task': task}
+        return render(request, 'tasks/description.html', context)
+    else:
+        return HttpResponseRedirect(reverse('tasks:index'))
 
 
 def task_data(request, task_id):
-    # download data zip page
-    task = Task.objects.get(id=task_id)
-    context = {'task': task}
-    return render(request, 'tasks/data.html', context)
+    if int(task_id) == Task.objects.filter(display=True)[0].id:
+        # download data zip page
+        task = Task.objects.get(id=task_id)
+        context = {'task': task}
+        return render(request, 'tasks/data.html', context)
+    else:
+        return HttpResponseRedirect(reverse('tasks:index'))
 
 
 def data_download(request, task_id):
@@ -145,7 +151,7 @@ def submit_result(request, task_id):
     task = Task.objects.get(id=task_id)
     user = request.user
     # 如果超过规定的可以提交的次数，则无法提交
-    if Result.objects.count() > 9:
+    if Result.objects.filter(task=task, user=user).count() > 9:
         return render(request, 'tasks/submit_failed.html')
     if request.method != 'POST':
         result_form = ResultForm()
