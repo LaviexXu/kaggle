@@ -1,6 +1,7 @@
 {% extends 'users/stuinfo.html' %}
 {% block content %}
     <div class="container" style="display:inline-block;">
+        <a href="{% url 'tasks:report_download' task.id student.id %}">下载该同学的报告</a>
             <ul>
             {% for pair in similar_pairs %}
                 <li><p>原文语句：{{pair.origin_sentence}}</p>

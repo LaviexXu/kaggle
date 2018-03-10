@@ -19,4 +19,6 @@ urlpatterns = [
     url(r'^task_list/(?P<task_id>\d+)/view_reports/$', views.view_reports, name='view_reports'),
     url(r'^task_list/(?P<task_id>\d+)/report_detail/(?P<student_id>\d+)/$',
         views.report_detail, name='report_detail'),
+    url(r'^task_list/(?P<task_id>\d+)/report_download/(?P<student_id>\d+)/$',
+        views.report_download, name='report_download'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

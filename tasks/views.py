@@ -25,7 +25,7 @@ def index(request):
     if Task.objects.count() > 0:
         task = Task.objects.filter(display=True)[0]
         context = {'task': task}
-        return render(request, 'tasks/description.html', context)
+        return render(request, 'tasks/overview.html', context)
     else:
         return HttpResponse("There is no task for now.")
 
@@ -107,7 +107,7 @@ def task_description(request, task_id):
     if task_id == Task.objects.filter(display=True)[0].id:
         task = Task.objects.get(id=task_id)
         context = {'task': task}
-        return render(request, 'tasks/description.html', context)
+        return render(request, 'tasks/overview.html', context)
     else:
         return HttpResponseRedirect(reverse('tasks:index'))
 
@@ -161,6 +161,8 @@ def submit_result(request, task_id):
         result_form = ResultForm(data=request.POST, files=request.FILES)
         if result_form.is_valid():
             result = result_form.save(commit=False)
+            if not result.result_csv.name.endwith('csv'):
+                return HttpResponse("请检查文件格式，必须为csv文件。")
             result.task = task
             result.user = user
             result.save()
@@ -184,6 +186,8 @@ def submit_result(request, task_id):
                 result.delete()
                 return HttpResponse("上传失败，请检查文件格式是否正确")
             return HttpResponseRedirect(reverse('tasks:view_submissions', args=[task_id]))
+        else:
+            return HttpResponse("上传失败，请检查文件格式是否正确")
 
 
 @login_required
@@ -256,5 +260,18 @@ def report_detail(request, task_id, student_id):
                         similar_sentence = compare_sentence
                 if max_similarity > 0.5:
                     similar_pairs.append(SimilarPair(sentence, similar_sentence))
-        context = {'similar_pairs': similar_pairs}
+        context = {'similar_pairs': similar_pairs,'task': task, 'student': student}
     return render(request, 'tasks/teacher_only/report_detail.html', context)
+
+
+def report_download(request, task_id, student_id):
+    task = Task.objects.get(id=task_id)
+    student = User.objects.get(id=student_id)
+    report = Report.objects.get(task=task, user=student)
+    if report is None:
+        report_file = open(report.report.path, 'rb')
+        response = FileResponse(report_file)
+        response['Content-Type'] = 'application/octet-stream'
+        response['Content-Disposition'] = 'attachment;filename="{0}"'.format(report.report.name)
+        return response
+    return HttpResponse("该同学暂未提交报告。")
