@@ -1,12 +1,12 @@
 {%extends 'users/stuinfo.html'%}
 {%block content%}
-    <p>Task:<br/>{{task.task_name}}</p>
+    <h3>{{task.task_name}}</h3>
+    <hr>
     <a href="{%url 'tasks:edit_task' task.id%}">edit this task</a>
-    <p>Display:{{task.display}}<br/>
-        这个页面是展示给教师看的，学生只能看到description，data，leaderboard三个板块的那个页面<br/>
-        这里只是方便调试,实际部署时是不显示这个属性的，这个属性是由老师来决定是否将该任务展示在task_list中的</p>
-    <h5>Description</h5>
-    <p>{{task.description}}</p>
-    <p>这列应该是数据下载,不过因为部署在服务器和本地调试时下载的方式不同,所以这个最后再做。</p>
+    <h3>是否展示到主页:{{task.display}}</h3><br/>
+       
+    <h3>Description</h3>
+    <p>{{task.description|linebreaks}}</p>
+
     <a href="{% url 'tasks:view_reports' task.id %}">课设报告及查重结果查看</a>
 {%endblock content%}

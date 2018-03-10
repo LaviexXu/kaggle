@@ -1,0 +1,31 @@
+
+[2018-03-10 14:23:25 +0800] [89846] [INFO] Worker exiting (pid: 89846)
+[2018-03-10 14:23:25 +0800] [55180] [INFO] Worker exiting (pid: 55180)
+[2018-03-10 14:23:25 +0800] [89851] [INFO] Worker exiting (pid: 89851)
+[2018-03-10 14:23:25 +0800] [89850] [INFO] Worker exiting (pid: 89850)
+[2018-03-10 14:23:25 +0800] [55176] [INFO] Worker exiting (pid: 55176)
+[2018-03-10 14:23:25 +0800] [89845] [INFO] Worker exiting (pid: 89845)
+[2018-03-10 14:23:25 +0800] [89842] [INFO] Handling signal: term
+[2018-03-10 06:23:25 +0000] [59700] [INFO] Worker exiting (pid: 59700)
+[2018-03-10 14:23:25 +0800] [55178] [INFO] Worker exiting (pid: 55178)
+[2018-03-10 14:23:25 +0800] [55177] [INFO] Worker exiting (pid: 55177)
+[2018-03-10 14:23:25 +0800] [2541] [INFO] Handling signal: term
+[2018-03-10 14:23:25 +0800] [89849] [INFO] Worker exiting (pid: 89849)
+[2018-03-10 14:23:25 +0800] [59697] [INFO] Handling signal: term
+[2018-03-10 14:23:25 +0800] [55179] [INFO] Worker exiting (pid: 55179)
+[2018-03-10 14:23:25 +0800] [59697] [INFO] Shutting down: Master
+[2018-03-10 14:23:25 +0800] [89842] [INFO] Shutting down: Master
+[2018-03-10 14:23:25 +0800] [2541] [INFO] Shutting down: Master
+[2018-03-10 14:24:18 +0800] [54227] [INFO] Starting gunicorn 19.7.1
+[2018-03-10 14:24:18 +0800] [54227] [INFO] Listening at: http://127.0.0.1:8001 (54227)
+[2018-03-10 14:24:18 +0800] [54227] [INFO] Using worker: sync
+[2018-03-10 14:24:18 +0800] [54230] [INFO] Booting worker with pid: 54230
+[2018-03-10 14:24:18 +0800] [54232] [INFO] Booting worker with pid: 54232
+[2018-03-10 14:24:18 +0800] [54233] [INFO] Booting worker with pid: 54233
+[2018-03-10 14:24:18 +0800] [54236] [INFO] Booting worker with pid: 54236
+[2018-03-10 14:24:18 +0800] [54237] [INFO] Booting worker with pid: 54237
+[2018-03-10 14:24:37 +0800] [54227] [INFO] Handling signal: winch
+[2018-03-10 15:47:53 +0800] [54227] [INFO] Handling signal: winch
+[2018-03-10 15:48:13 +0800] [54227] [INFO] Handling signal: winch
+[2018-03-10 16:03:39 +0800] [54227] [INFO] Handling signal: winch
+[2018-03-10 16:03:40 +0800] [54227] [INFO] Handling signal: winch

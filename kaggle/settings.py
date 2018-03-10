@@ -79,8 +79,12 @@ WSGI_APPLICATION = 'kaggle.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'laviedb',
+	'USER': 'yfxu',
+	'PASSWORD':'laviexxu',
+	'HOST': 'localhost',
+	"PORT": '',
     }
 }
 
@@ -115,16 +119,17 @@ USE_I18N = True
 
 USE_L10N = True
 
-USE_TZ = True
+USE_TZ = False
+TIME_ZONE = 'Asia/Shanghai'
 
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
 
 STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+STATIC_ROOT = '/home/yfpan/CourseDesignPlatform/kaggle/static'
 MEDIA_URL = '/files/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'files')
+MEDIA_ROOT = '/home/yfpan/CourseDesignPlatform/kaggle/files' 
 BOOTSTRAP3 = {
     'include_jquery': True,
 }
