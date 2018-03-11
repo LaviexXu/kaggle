@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from .models import Task, Result, Report
 from django.contrib.auth.models import User
-from django.http import HttpResponseRedirect, HttpResponse,FileResponse
+from django.http import HttpResponseRedirect, HttpResponse, FileResponse
 from .forms import TaskForm, ResultForm, ReportForm, EmailForm
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
@@ -26,8 +26,6 @@ def index(request):
         task = Task.objects.filter(display=True)[0]
         context = {'task': task}
         return render(request, 'tasks/overview.html', context)
-    elif request.user.is_staff:
-        return HttpResponseRedirect(reverse('tasks:task_list'))
     else:
         return HttpResponse("There is no task for now.")
 
@@ -35,6 +33,19 @@ def index(request):
 def tasks(request):
     if not request.user.is_staff:
         return HttpResponseRedirect(reverse('tasks:index'))
+    task_list = Task.objects.all()
+    if request.method == 'POST':
+        selected_task_id = request.POST.get("display_task")
+        print(selected_task_id)
+        print(selected_task_id != "Nothing")
+        if selected_task_id != "Nothing":
+            for task in task_list:
+                if task.id == int(selected_task_id):
+                    task.display = True
+                    task.save()
+                else:
+                    task.display = False
+                    task.save()
     task_list = Task.objects.order_by('date_added')
     context = {'tasks': task_list}
     return render(request, 'tasks/task_list.html', context)
@@ -86,7 +97,6 @@ def new_email(request):
             try:
                 send_mail(subject, content, from_email=DEFAULT_FROM_EMAIL, recipient_list=recipient, fail_silently=False)
             except SMTPException:
-                print("Unexpected error:", sys.exc_info()[0])
                 return HttpResponse('email sending failed')
             return HttpResponse('email has been sent to all student.You can check it in your mail-box')
 
@@ -115,10 +125,19 @@ def task_data(request, task_id):
     if int(task_id) == Task.objects.filter(display=True)[0].id:
         task = Task.objects.get(id=task_id)
         context = {'task': task}
+        return render(request, 'tasks/overview.html', context)
+    else:
+        return HttpResponseRedirect(reverse('tasks:index'))
+
+
+def task_data(request, task_id):
+    if int(task_id) == Task.objects.filter(display=True)[0].id:
+        # download data zip page
+        task = Task.objects.get(id=task_id)
+        context = {'task': task}
         return render(request, 'tasks/data.html', context)
     else:
-        # return HttpResponseRedirect(reverse('tasks:index'))
-        return HttpResponse(str(int(task_id)==Task.objects.filter(display=True)[0].id))
+        return HttpResponseRedirect(reverse('tasks:index'))
 
 
 def data_download(request, task_id):
@@ -224,15 +243,17 @@ def submit_report(request, task_id):
             return render(request, 'tasks/submit_report.html', context)
         else:
             report_form = ReportForm(data=request.POST, files=request.FILES)
-            report = report_form.save(commit=False)
-            report.task = task
-            report.user = user
-            report.save()
-            context = {'task': task}
-            return render(request, 'tasks/submit_successful.html', context)
-    else:
-        # return HttpResponseRedirect(reverse('tasks:index'))
-        return HttpResponse('redirecti')
+            if report_form.is_valid():
+                report = report_form.save(commit=False)
+                if report.report.name.endswith("pdf"):
+                    report.task = task
+                    report.user = user
+                    report.save()
+                    context = {'task': task}
+                    return render(request, 'tasks/submit_successful.html', context)
+                else:
+                    return HttpResponse("提交失败，请检查文件格式，仅限上传pdf。")
+    return HttpResponseRedirect(reverse('tasks:index'))
 
 
 @login_required
@@ -242,11 +263,11 @@ def view_reports(request, task_id):
         return HttpResponseRedirect(reverse('tasks:index'))
     task = Task.objects.get(id=task_id)
     reports = Report.objects.filter(task=task)
-    context = {'reports': reports,'task': task}
+    context = {'reports': reports, 'task': task}
     return render(request, 'tasks/teacher_only/view_reports.html', context)
 
 
-# @login_required 此页面仅教师可见
+@login_required
 def report_detail(request, task_id, student_id):
     if not request.user.is_staff:
         return HttpResponseRedirect(reverse('tasks:index'))
@@ -274,5 +295,18 @@ def report_detail(request, task_id, student_id):
                         similar_sentence = compare_sentence
                 if max_similarity > 0.5:
                     similar_pairs.append(SimilarPair(sentence, similar_sentence))
-        context = {'similar_pairs': similar_pairs}
+        context = {'similar_pairs': similar_pairs,'task': task, 'student': student}
     return render(request, 'tasks/teacher_only/report_detail.html', context)
+
+
+def report_download(request, task_id, student_id):
+    task = Task.objects.get(id=task_id)
+    student = User.objects.get(id=student_id)
+    report = Report.objects.get(task=task, user=student)
+    if report is not None:
+        report_file = open(report.report.path, 'rb')
+        response = FileResponse(report_file)
+        response['Content-Type'] = 'application/octet-stream'
+        response['Content-Disposition'] = 'attachment;filename="{0}"'.format(report.report.name)
+        return response
+    return HttpResponse("该同学暂未提交报告。")
