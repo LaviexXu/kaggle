@@ -13,5 +13,5 @@
 </div>
 {% endblock navigation %}
 {%block content%}
-<p><a href="{% url 'tasks:data_download' task.id%}">{{task.data_zip}}</a></p>
+<p><a href="{% url 'tasks:data_download' task.id%}">{{task.data_zip.name}}</a></p>
 {%endblock content%}
