@@ -1,6 +1,19 @@
 {%extends "users/stuinfo.html"%}
+{% load bootstrap3 %}
 {%block content%}
     <p>Tasks</p>
+    <form action="{% url 'tasks:task_list' %}" method="post">
+    <select name="display_task">
+        <option value="Nothing">- - - -</option>
+        {% for task in tasks %}
+        <option value={{task.id}}>{{task.task_name}}</option>
+        {% endfor %}
+    </select>
+        {% buttons %}
+        <button name="submit" class="btn btn-primary">set display</button>
+    {% endbuttons %}
+    </form>
+
     <ul>
         {%for task in tasks%}
         <li><a href="{%url 'tasks:task_detail' task.id%}" target="_blank">{{task.task_name}}</a></li>

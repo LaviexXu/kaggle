@@ -33,6 +33,21 @@ def index(request):
 def tasks(request):
     if not request.user.is_staff:
         return HttpResponseRedirect(reverse('tasks:index'))
+    task_list = Task.objects.all()
+    if request.method == 'POST':
+        selected_task_id = request.POST.get("display_task")
+        print(selected_task_id)
+        print(selected_task_id != "Nothing")
+        if selected_task_id != "Nothing":
+            for task in task_list:
+                if task.id == int(selected_task_id):
+                    task.display = True
+                    task.save()
+                    print(task.task_name)
+                else:
+                    print(task.task_name+"\tNot Display")
+                    task.display = False
+                    task.save()
     task_list = Task.objects.order_by('date_added')
     context = {'tasks': task_list}
     return render(request, 'tasks/task_list.html', context)
