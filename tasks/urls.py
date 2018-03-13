@@ -21,4 +21,6 @@ urlpatterns = [
         views.report_detail, name='report_detail'),
     url(r'^task_list/(?P<task_id>\d+)/report_download/(?P<student_id>\d+)/$',
         views.report_download, name='report_download'),
+    url(r'^task_list/(?P<task_id>\d+)/report_zip_download/$',
+        views.report_zip_download, name='report_zip_download')
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

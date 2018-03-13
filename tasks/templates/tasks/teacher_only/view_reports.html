@@ -1,7 +1,7 @@
 {%extends 'users/stuinfo.html'%}
 {%block content%}
 <a href="{% url 'tasks:task_detail' task.id%}">返回任务详情</a>
-
+    <a href="{% url 'tasks:report_zip_download' task.id %}"></a>
     <table class="table table-hover">
     <thead>
         <tr>

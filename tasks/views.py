@@ -9,9 +9,11 @@ import csv
 from .pdfdiff import read_pdf, get_similarity
 from kaggle.settings import STATIC_ROOT, DEFAULT_FROM_EMAIL
 from django.core.mail import send_mail
+from wsgiref.util import FileWrapper
 from smtplib import SMTPException
 import os
-import sys
+import zipfile
+import tempfile
 
 
 class SimilarPair:
@@ -275,7 +277,7 @@ def report_detail(request, task_id, student_id):
                         similar_sentence = compare_sentence
                 if max_similarity > 0.5:
                     similar_pairs.append(SimilarPair(sentence, similar_sentence))
-        context = {'similar_pairs': similar_pairs,'task': task, 'student': student}
+        context = {'similar_pairs': similar_pairs, 'task': task, 'student': student}
     return render(request, 'tasks/teacher_only/report_detail.html', context)
 
 
@@ -290,3 +292,19 @@ def report_download(request, task_id, student_id):
         response['Content-Disposition'] = 'attachment;filename="{0}"'.format(report.report.name)
         return response
     return HttpResponse("该同学暂未提交报告。")
+
+
+def report_zip_download(request,task_id):
+    task = Task.objects.get(id=task_id)
+    report_list = Report.object.filter(task=task)  # report object list
+    temp = tempfile.TemporaryFile()
+    report_zip = zipfile.ZipFile(temp, 'w', zipfile.ZIP_DEFLATED)
+    for report in report_list:
+        report_zip.write(report.report.path)
+    report_zip.close()
+    wrapper = FileWrapper(temp)
+    response = HttpResponse(wrapper, content_type='application/zip')
+    response['Content-Disposition'] = 'attachment; filename="reports.zip"'
+    response['Content-Length'] = temp.tell()
+    temp.seek(0)
+    return response
