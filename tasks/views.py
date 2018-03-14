@@ -24,7 +24,7 @@ class SimilarPair:
 
 # Create your views here.
 def index(request):
-    if Task.objects.count() > 0:
+    if Task.objects.filter(display=True).count() > 0:
         task = Task.objects.filter(display=True)[0]
         context = {'task': task}
         return render(request, 'tasks/overview.html', context)
