@@ -22,6 +22,9 @@
                     <ul class="nav navbar-nav navbar-right">
                         {% if user.is_authenticated %}
                             <li><a>Hello,{{user.userprofile.name}}</a></li>
+                        {% if user.is_staff %}
+                            <li><a href="{% url 'tasks:task_list' %}">view all task</a></li>
+                        {% endif %}
                             <li><a href="{% url 'users:logout' %}">log out</a> </li>
                         {% else %}
                             <li><a href="{% url 'users:register' %}">register</a> </li>

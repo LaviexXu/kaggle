@@ -29,7 +29,7 @@ def index(request):
         context = {'task': task}
         return render(request, 'tasks/overview.html', context)
     else:
-        return HttpResponse("There is no task for now.")
+        return render(request, 'tasks/no_task.html')
 
 
 def tasks(request):
