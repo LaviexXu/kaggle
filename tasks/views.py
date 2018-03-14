@@ -317,7 +317,7 @@ def report_download(request, task_id, student_id):
 
 def report_zip_download(request,task_id):
     task = Task.objects.get(id=task_id)
-    report_list = Report.object.filter(task=task)  # report object list
+    report_list = Report.objects.filter(task=task)  # report object list
     temp = tempfile.TemporaryFile()
     report_zip = zipfile.ZipFile(temp, 'w', zipfile.ZIP_DEFLATED)
     for report in report_list:
