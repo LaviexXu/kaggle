@@ -1,11 +1,11 @@
 {%extends 'users/stuinfo.html'%}
 {%block content%}
-<a href="{% url 'tasks:task_detail' task.id%}">返回任务详情</a>
-    <a href="{% url 'tasks:report_zip_download' task.id %}"></a>
+<a href="{% url 'tasks:task_detail' task.id%}">back to task details</a>
+    <a href="{% url 'tasks:report_zip_download' task.id %}">download students' report as a zip file</a>
     <table class="table table-hover">
     <thead>
         <tr>
-            <td>学号</td><td>姓名</td><td>报告</td>
+            <td>Student No</td><td>Name</td><td>Report</td>
         </tr>
     </thead>
     <tbody>

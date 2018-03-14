@@ -4,7 +4,7 @@
     <p>Tasks</p>
     <form action="{% url 'tasks:task_list' %}" method="post">
     <select name="display_task">
-        <option value="Nothing">- - - -</option>
+        <option value="Nothing">Show nothing on home page</option>
         {% for task in tasks %}
         <option value={{task.id}}>{{task.task_name}}</option>
         {% endfor %}

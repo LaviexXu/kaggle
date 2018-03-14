@@ -38,9 +38,11 @@ def tasks(request):
     task_list = Task.objects.all()
     if request.method == 'POST':
         selected_task_id = request.POST.get("display_task")
-        print(selected_task_id)
-        print(selected_task_id != "Nothing")
-        if selected_task_id != "Nothing":
+        if selected_task_id == "Nothing":
+            for task in task_list:
+                task.display = False
+                task.save()
+        else:
             for task in task_list:
                 if task.id == int(selected_task_id):
                     task.display = True
@@ -170,13 +172,12 @@ def task_leaderboard(request, task_id):
         return HttpResponseRedirect(reverse('tasks:index'))
 
 
-
 @login_required
 def submit_result(request, task_id):
     if int(task_id) == Task.objects.filter(display=True)[0].id:
         task = Task.objects.get(id=task_id)
         user = request.user
-    	# 如果超过规定的可以提交的次数，则无法提交
+        # 如果超过规定的可以提交的次数，则无法提交
         if Result.objects.filter(user=user,task=task).count() > 9:
             return render(request, 'tasks/submit_failed.html')
         if request.method != 'POST':
