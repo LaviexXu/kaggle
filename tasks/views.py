@@ -45,9 +45,7 @@ def tasks(request):
                 if task.id == int(selected_task_id):
                     task.display = True
                     task.save()
-                    print(task.task_name)
                 else:
-                    print(task.task_name+"\tNot Display")
                     task.display = False
                     task.save()
     task_list = Task.objects.order_by('date_added')
@@ -75,7 +73,7 @@ def edit_task(request, task_id):
 def task_detail(request, task_id):
     # the page students and teachers can see are different
     if not request.user.is_staff:
-            return HttpResponseRedirect(reverse('tasks:index'))
+        return HttpResponseRedirect(reverse('tasks:index'))
     task = Task.objects.get(id=task_id)
     context = {'task': task}
     return render(request, 'tasks/teacher_only/task_detail.html', context)
@@ -121,7 +119,12 @@ def new_task(request):
 
 
 def task_description(request, task_id):
-    if task_id == Task.objects.filter(display=True)[0].id:
+    return HttpResponseRedirect(reverse('tasks:index'))
+
+
+def task_data(request, task_id):
+    # download data zip page
+    if int(task_id) == Task.objects.filter(display=True)[0].id:
         task = Task.objects.get(id=task_id)
         context = {'task': task}
         return render(request, 'tasks/overview.html', context)
@@ -140,111 +143,126 @@ def task_data(request, task_id):
 
 
 def data_download(request, task_id):
-    task = Task.objects.get(id=task_id)
-    data_file = open(task.data_zip.path, 'rb')
-    response = FileResponse(data_file)
-    response['Content-Type'] = 'application/octet-stream'
-    response['Content-Disposition'] = 'attachment;filename="{0}"'.format(task.data_zip.name)
-    return response
+    if int(task_id) == Task.objects.filter(display=True)[0].id:
+        task = Task.objects.get(id=task_id)
+        data_file = open(task.data_zip.path, 'rb')
+        response = FileResponse(data_file)
+        response['Content-Type'] = 'application/octet-stream'
+        response['Content-Disposition'] = 'attachment;filename="{0}"'.format(task.data_zip.name)
+        return response
 
 
 def task_leaderboard(request, task_id):
     # filter students' results by task_id
-    task = Task.objects.get(id=task_id)
-    users = User.objects.all()
-    results = []*len(users)
-    for user in users:
-        if Result.objects.filter(task=task, user=user).count() > 0:
-            user_results = Result.objects.filter(task=task, user=user).order_by('score')
-            results.append(user_results[0])
+    if int(task_id) == Task.objects.filter(display=True)[0].id:
+        task = Task.objects.get(id=task_id)
+        users = User.objects.all()
+        results = []*len(users)
+        for user in users:
+            if Result.objects.filter(task=task, user=user).count() > 0:
+                user_results = Result.objects.filter(task=task, user=user).order_by('score')
+                results.append(user_results[0])
 
-    results.sort(key=lambda result: result.score)
-    context = {'task': task, 'results': results}
-    return render(request, 'tasks/leaderboard.html', context)
+        results.sort(key=lambda result: result.score)
+        context = {'task': task, 'results': results}
+        return render(request, 'tasks/leaderboard.html', context)
+    else:
+        return HttpResponseRedirect(reverse('tasks:index'))
+
 
 
 @login_required
 def submit_result(request, task_id):
-    task = Task.objects.get(id=task_id)
-    user = request.user
-    # 如果超过规定的可以提交的次数，则无法提交
-    if Result.objects.filter(task=task, user=user).count() > 9:
-        return render(request, 'tasks/submit_failed.html')
-    if request.method != 'POST':
-        result_form = ResultForm()
-        context = {'form': result_form, 'task': task}
-        return render(request, 'tasks/new_submission.html', context)
-    else:
-        result_form = ResultForm(data=request.POST, files=request.FILES)
-        if result_form.is_valid():
-            result = result_form.save(commit=False)
-            if not result.result_csv.name.endwith('csv'):
-                return HttpResponse("请检查文件格式，必须为csv文件。")
-            result.task = task
-            result.user = user
-            result.save()
-            ref_result = []
-            user_result = []
-            with open(task.result_csv.path, newline='') as ref_csv:
-                ref_csv_reader = csv.reader(ref_csv, quoting=csv.QUOTE_NONNUMERIC)
-                for data in ref_csv_reader:
-                    ref_result.append(data[0])
-            with open(result.result_csv.path, newline='') as user_csv:
-                user_csv_reader = csv.reader(user_csv, quoting=csv.QUOTE_NONNUMERIC)
-                for data in user_csv_reader:
-                    user_result.append(data[0])
-            if len(user_result) == len(ref_result):
-                mean_square_error = 0
-                for i in range(len(ref_result)):
-                    mean_square_error += (user_result[i]-ref_result[i])**2
-                result.score = mean_square_error
-                result.save()
-            else:
-                result.delete()
-                return HttpResponse("上传失败，请检查文件格式是否正确")
-            return HttpResponseRedirect(reverse('tasks:view_submissions', args=[task_id]))
+    if int(task_id) == Task.objects.filter(display=True)[0].id:
+        task = Task.objects.get(id=task_id)
+        user = request.user
+    	# 如果超过规定的可以提交的次数，则无法提交
+        if Result.objects.filter(user=user,task=task).count() > 9:
+            return render(request, 'tasks/submit_failed.html')
+        if request.method != 'POST':
+            result_form = ResultForm()
+            context = {'form': result_form, 'task': task}
+            return render(request, 'tasks/new_submission.html', context)
         else:
-            return HttpResponse("上传失败，请检查文件格式是否正确")
+            result_form = ResultForm(data=request.POST, files=request.FILES)
+            if result_form.is_valid():
+                result = result_form.save(commit=False)
+                if not result.result_csv.name.endwith('csv'):
+                    return HttpResponse('上传失败，请检查文件格式是否正确')
+                result.task = task
+                result.user = user
+                result.save()
+                ref_result = []
+                user_result = []
+                with open(task.result_csv.path, newline='') as ref_csv:
+                    ref_csv_reader = csv.reader(ref_csv, quoting=csv.QUOTE_NONNUMERIC)
+                    for data in ref_csv_reader:
+                         ref_result.append(data[0])
+                with open(result.result_csv.path, newline='') as user_csv:
+                    user_csv_reader = csv.reader(user_csv, quoting=csv.QUOTE_NONNUMERIC)
+                    for data in user_csv_reader:
+                        user_result.append(data[0])
+                if len(user_result) == len(ref_result):
+                    mean_square_error = 0
+                    for i in range(len(ref_result)):
+                        mean_square_error += (user_result[i]-ref_result[i])**2
+                    result.score = mean_square_error
+                    result.save()
+            # else: 上传失败页面
+                else:
+                    result.delete()
+                    return HttpResponse("上传失败，请检查文件格式是否正确")
+                return HttpResponseRedirect(reverse('tasks:view_submissions', args=[task_id]))
+    else:
+        return HttpResponseRedirect(reverse('tasks:index'))
+    return HttpResponseRedirect(reverse('tasks:index'))
 
 
 @login_required
 def view_submissions(request, task_id):
-    task = Task.objects.get(id=task_id)
-    user = request.user
-    submit_history = Result.objects.filter(task=task, user=user).order_by('date_added')
-    context = {'submissions': submit_history, 'task': task}
-    return render(request, 'tasks/view_submissions.html', context)
+    if int(task_id) == Task.objects.filter(display=True)[0].id:    
+        task = Task.objects.get(id=task_id)
+        user = request.user
+        submit_history = Result.objects.filter(task=task, user=user).order_by('date_added')
+        context = {'submissions': submit_history, 'task': task}
+        return render(request, 'tasks/view_submissions.html', context)
+    else:
+        return HttpResponseRedirect(reverse('tasks:index'))
 
 
 @login_required
 def submit_report(request, task_id):
-    task = Task.objects.get(id=task_id)
-    user = request.user
-    if Report.objects.filter(task=task, user=user).count() > 0:
-        context = {'task': task}
-        return render(request, 'tasks/submit_successful.html', context)
+    if int(task_id) == Task.objects.filter(display=True)[0].id:
+        task = Task.objects.get(id=task_id)
+        user = request.user
+        if Report.objects.filter(task=task, user=user).count() > 0:
+            context = {'task': task}
+            return render(request, 'tasks/submit_successful.html', context)
 
-    if request.method != 'POST':
-        report_form = ReportForm()
-        context = {'form': report_form, 'task': task}
-        return render(request, 'tasks/submit_report.html', context)
-    else:
-        report_form = ReportForm(data=request.POST, files=request.FILES)
-        if report_form.is_valid():
-            report = report_form.save(commit=False)
-            if report.report.name.endswith("pdf"):
-                report.task = task
-                report.user = user
-                report.save()
-                context = {'task': task}
-                return render(request, 'tasks/submit_successful.html', context)
-            else:
-                return HttpResponse("提交失败，请检查文件格式，仅限上传pdf。")
+        if request.method != 'POST':
+            report_form = ReportForm()
+            context = {'form': report_form, 'task': task}
+            return render(request, 'tasks/submit_report.html', context)
+        else:
+            report_form = ReportForm(data=request.POST, files=request.FILES)
+            if report_form.is_valid():
+                report = report_form.save(commit=False)
+                if report.report.name.endswith("pdf"):
+                    report.task = task
+                    report.user = user
+                    report.save()
+                    context = {'task': task}
+                    return render(request, 'tasks/submit_successful.html', context)
+                else:
+                    return HttpResponse("提交失败，请检查文件格式，仅限上传pdf。")
+    return HttpResponseRedirect(reverse('tasks:index'))
 
 
 @login_required
 # 此页面仅教师可见
 def view_reports(request, task_id):
+    if not request.user.is_staff:
+        return HttpResponseRedirect(reverse('tasks:index'))
     task = Task.objects.get(id=task_id)
     reports = Report.objects.filter(task=task)
     context = {'reports': reports, 'task': task}
@@ -253,6 +271,8 @@ def view_reports(request, task_id):
 
 @login_required
 def report_detail(request, task_id, student_id):
+    if not request.user.is_staff:
+        return HttpResponseRedirect(reverse('tasks:index'))
     task = Task.objects.get(id=task_id)
     student = User.objects.get(id=student_id)
     report = Report.objects.get(task=task, user=student)
@@ -285,7 +305,7 @@ def report_download(request, task_id, student_id):
     task = Task.objects.get(id=task_id)
     student = User.objects.get(id=student_id)
     report = Report.objects.get(task=task, user=student)
-    if report is None:
+    if report is not None:
         report_file = open(report.report.path, 'rb')
         response = FileResponse(report_file)
         response['Content-Type'] = 'application/octet-stream'

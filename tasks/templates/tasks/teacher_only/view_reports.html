@@ -13,8 +13,8 @@
             <tr>
                 <td>{{report.user.username}}</td>
                 <td>{{report.user.userprofile.name}}</td>
-                <td><a href="{% url 'tasks:report_detail' report.task.id report.user.id%}"
-                 target="_blank">下载报告并查看查重结果</a></td>
+                <td><a href="{% url 'tasks:report_download' report.task.id report.user.id %}" target="_blank">下载报告</a>
+		<a href="{% url 'tasks:report_detail' report.task.id report.user.id%}"target="_blank">查看查重结果</a></td>
             </tr>
         {%endfor%}
     </tbody>

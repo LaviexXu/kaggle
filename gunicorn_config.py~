@@ -1,0 +1,8 @@
+command = '/home/yfpan/CourseDesignPlatform/bin/gunicorn'
+pythonpath = '/home/yfpan/CourseDesignPlatform/kaggle'
+bind = '127.0.0.1:80'
+workers = 1
+debug = True
+accesslog = 'log/access.log'
+errorlog = 'log/debug.log'
+
