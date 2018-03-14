@@ -322,7 +322,6 @@ def report_zip_download(request,task_id):
     report_zip = zipfile.ZipFile(temp, 'w', zipfile.ZIP_DEFLATED)
     for report in report_list:
         report_zip.write(report.report.path)
-    report_zip.close()
     wrapper = FileWrapper(temp)
     response = HttpResponse(wrapper, content_type='application/zip')
     response['Content-Disposition'] = 'attachment; filename="reports.zip"'
