@@ -318,13 +318,17 @@ def report_download(request, task_id, student_id):
 def report_zip_download(request,task_id):
     task = Task.objects.get(id=task_id)
     report_list = Report.objects.filter(task=task)  # report object list
+    if len(report_list)==0:
+        return HttpResponse("暂时还没有人提交报告")
     temp = tempfile.TemporaryFile()
     report_zip = zipfile.ZipFile(temp, 'w', zipfile.ZIP_DEFLATED)
     for report in report_list:
         report_zip.write(report.report.path)
+    report_zip.close()
     wrapper = FileWrapper(temp)
-    response = HttpResponse(wrapper, content_type='application/zip')
-    response['Content-Disposition'] = 'attachment; filename="reports.zip"'
-    response['Content-Length'] = temp.tell()
+    size = temp.tell()
     temp.seek(0)
+    response = HttpResponse(wrapper, content_type='application/zip')
+    response['Content-Length'] = size
+    response['Content-Disposition'] = 'attachment; filename="reports.zip"'
     return response

@@ -46,7 +46,7 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-    # 'django.middleware.csrf.CsrfViewMiddleware',
+    #'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -79,12 +79,8 @@ WSGI_APPLICATION = 'kaggle.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'laviedb',
-	'USER': 'yfxu',
-	'PASSWORD':'laviexxu',
-	'HOST': 'localhost',
-	"PORT": '',
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
 }
 
@@ -119,17 +115,16 @@ USE_I18N = True
 
 USE_L10N = True
 
-USE_TZ = False
-TIME_ZONE = 'Asia/Shanghai'
+USE_TZ = True
 
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
 
 STATIC_URL = '/static/'
-STATIC_ROOT = '/home/yfpan/CourseDesignPlatform/kaggle/static'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 MEDIA_URL = '/files/'
-MEDIA_ROOT = '/home/yfpan/CourseDesignPlatform/kaggle/files' 
+MEDIA_ROOT = os.path.join(BASE_DIR, 'files')
 BOOTSTRAP3 = {
     'include_jquery': True,
 }
